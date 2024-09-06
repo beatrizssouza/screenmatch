@@ -26,7 +26,6 @@ public class Principal {
         var json = consumo.obterDados(ENDERECO + nomeSerie.replace(" ", "+") + API_KEY);
 
         DadosSerie dados = conversor.obterDados(json, DadosSerie.class);
-        System.out.println(dados);
 
         List<DadosTemporada> temporadas = new ArrayList<>();
 
@@ -34,7 +33,6 @@ public class Principal {
             json = consumo.obterDados(ENDERECO + nomeSerie.replace(" ", "+") +"&season=" + i + API_KEY);
             DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
             temporadas.add(dadosTemporada);
-
         }
 
         // temporadas.forEach(System.out::println); === temporadas.forEach( t -> System.out.println(t))
@@ -53,13 +51,30 @@ public class Principal {
                 .limit(5)
                 .forEach(System.out::println);
 
-        System.out.println("\n Episódios com as temporadas: ");
+       // System.out.println("\n Episódios com as temporadas: ");
 
         List<Episodio> episodios = temporadas.stream()
                 .flatMap(t -> t.episodios().stream()
                     .map(d -> new Episodio(t.numero(),d))).collect(Collectors.toList());
 
-        episodios.forEach(System.out::println);
+        //episodios.forEach(System.out::println);
+
+        System.out.println("\n Digite um trecho do título do episodio ? \n ");
+
+        var trechoTitulo = leitura.nextLine();
+
+        Optional<Episodio> episodioBuscado = episodios.stream()
+                .filter(e -> e.getTitulo().toUpperCase().contains(trechoTitulo.toUpperCase()))
+                .findFirst();
+
+        if(episodioBuscado.isPresent()){
+            System.out.println("Episódio encontrado!");
+            System.out.println("Temporada: " + episodioBuscado.get().getTemporada());
+        }else {
+            System.out.println("Episódio não encontrado!");
+        }
+
+
 
         System.out.println("A partir de que ano voce deseja ver os episódios? ");
         var ano = leitura.nextInt();
